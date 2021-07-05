@@ -1,0 +1,9 @@
+POST http://localhost:12345/search
+Content-Type: application/json
+
+{
+    "data":{
+        "text":"Hello"
+    }
+}
+
