@@ -26,11 +26,24 @@ def load_model():
 
 
 def mnist_encode_gen():
-    size = 100
+    size = 500
     for i in range(size):
         img = X_train.iloc[i].to_numpy(dtype='float32')
         img /= 255.0
         yield Document(embedding=encoder.predict(img.reshape(-1,28,28,1)),tags={'id':int(i)})
+
+def cosine_similarity(q, d):
+    d_norm = np.linalg.norm(d,axis=2)
+    q_norm = np.linalg.norm(q,axis=2)
+
+    deno = q_norm * d_norm
+    q_prime = np.swapaxes(q,1,2)
+
+    dot = d.dot(q_prime)
+    dot = dot.reshape((d.shape[0],1))
+
+    return (dot/(deno + 1e-5))
+
 
 class MnistExecutor(Executor):
     _docs = DocumentArray()
@@ -61,13 +74,20 @@ class MnistExecutor(Executor):
         
         q = np.stack(docs.get_attributes('embedding'))
         d = np.stack(self._docs.get_attributes('embedding'))
+        # print(q.shape,d.shape)
         eucledian_dist = np.linalg.norm(q[:, None, :] - d[None, :, :], axis=-1)
+        # similarity = cosine_similarity(q,d)
+        # similarity = similarity.reshape((1,similarity.shape[0],similarity.shape[1]))
         
+        top_k = int(parameters['top_k']) if 'top_k' in parameters else 3
         for dist,query in zip(eucledian_dist,docs):
 
             query.matches = [Document(self._docs[int(idx)], copy=True,tags={'score':float(d[0]),'id': int(self._docs[int(idx)].tags['id'])}) for idx, d in enumerate(dist)]
             query.matches.sort(key=lambda m: m.tags['score'])
-        
+
+            if top_k > len(query.matches):
+                query.matches = query.matches[:top_k]
+
         return docs
 
         

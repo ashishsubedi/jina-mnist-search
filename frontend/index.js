@@ -15,6 +15,7 @@ document.getElementById("submit").addEventListener("click", function (e) {
       post_data = JSON.stringify({
         parameters: {
           image_uri: base64String,
+          top_k:10
         },
       });
 
@@ -33,8 +34,22 @@ document.getElementById("submit").addEventListener("click", function (e) {
       console.log("matches", image_matches);
       
       const id_set = new Set(image_matches.map(el => el.tags.id))
+      const id_array = image_matches.map(el => el.tags.id)
+      const score_obj = {}
+      image_matches.forEach(el =>{
+        
+        score_obj[el.tags.id] = el.tags.score
+      })
+      console.log(score_obj)
 
-      console.log(id_set);
+      var result_div = document.getElementById('result-div')
+      result_div.innerHTML = ''
+      id_array.forEach(id=>{
+        const newDiv = document.createElement("div");
+        newDiv.setAttribute('id',id)
+        result_div.appendChild(newDiv)
+      })
+
       console.log("Parsing CSV");
       $("#csv").parse({
         config: {
@@ -42,8 +57,9 @@ document.getElementById("submit").addEventListener("click", function (e) {
           worker: true,
           fastMode:true,
           chunk: function (rows) {
-            // console.log(rows)
-            parseCSV(rows,id_set,image_matches);
+            internalCounter = 0
+            parseCSV(rows,internalCounter,id_set,score_obj);
+
             
           },
         },
@@ -53,23 +69,23 @@ document.getElementById("submit").addEventListener("click", function (e) {
   }
 });
 
-const parseCSV = (rows,id_set,image_matches) => {
-  internalCounter = 0
-
+const parseCSV = (rows,internalCounter,id_set,score_obj) => {
+  
   rows.data.forEach((chunk) => {
     chunk.forEach((text) => {
       if (text[0] === 'l') return;
+
       
-      
-      textArray = text.trim().split(',')
-      // console.log(textArray);
-      internalCounter ++;
+      pixelArray = text.trim().split(',').slice(1)
+      // console.log(pixelArray);
       if (id_set.has(internalCounter)){
         // This image is a match
         //DISPLAY IMAGE
-        createImageFromPixel(textArray.slice(1))
+        createImageFromPixel(pixelArray,internalCounter,score_obj[internalCounter])
         
       }
+      internalCounter ++;
+      
       
 
 
@@ -77,10 +93,31 @@ const parseCSV = (rows,id_set,image_matches) => {
   });
 };
 
-function createImageFromPixel(image_matches){
+
+const find_array_from_id = (rows,id) => {
+  internalCounter = 0
+
+  rows.data.forEach((chunk) => {
+    chunk.forEach((text) => {
+      if (text[0] === 'l') return;
+      
+      
+      pixelArray = text.trim().split(',').slice(1)
+
+      if (internalCounter === id) return pixelArray;
+
+      internalCounter ++;
+ 
+    });
+  });
+  return false;
+};
+
+function createImageFromPixel(pixel_data,idx=0,score=0){
   // create an offscreen canvas
 var canvas=document.createElement("canvas");
 var ctx=canvas.getContext("2d");
+
 
 // size the canvas to your desired image
 canvas.width=28;
@@ -92,13 +129,12 @@ var data=imgData.data;
 let j = 0
 // manipulate some pixel elements
 for(var i=0;i<data.length;i+=4){
-    data[i]=image_matches[j];   // set every red pixel element to 255
-    data[i+1]=image_matches[j];   // set every red pixel element to 255
-    data[i+2]=image_matches[j];   // set every red pixel element to 255
+    data[i]=pixel_data[j];   // set every red pixel element to 255
+    data[i+1]=pixel_data[j];   // set every red pixel element to 255
+    data[i+2]=pixel_data[j];   // set every red pixel element to 255
     data[i+3]=255; // make this pixel opaque
     j++;
 }
-console.log("Image",data)
 
 // put the modified pixels back on the canvas
 ctx.putImageData(imgData,0,0);
@@ -108,7 +144,13 @@ var image=new Image();
 
 // set the img.src to the canvas data url
 image.src=canvas.toDataURL();
+image.id = idx
+var result_div = document.getElementById(idx)
+
+var text = new Text();
+text.nodeValue = score
 
 // append the new img object to the page
-document.body.appendChild(image);
+result_div.appendChild(image);
+result_div.appendChild(text);
 }
