@@ -5,15 +5,20 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mnist Search</title>
+    
 </head>
 <body>
+    <input type="file" name="csv" id="csv" required >
     <form action="" enctype="multipart/form-data" method="post" id='form'>
         
         <input type="file" name="image" id="image"/>
         <input type="submit" id='submit' value="Submit"/>
     </form>
     <div id='result-div'></div>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 
-    <script defer src="./index.js" ></script>
+    <script  src="./papaparse.min.js"></script>
+    <script defer src="index.js" ></script>
 </body>
 </html>

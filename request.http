@@ -1,9 +1,8 @@
 POST http://localhost:12345/search
 Content-Type: application/json
 
-{
-    "data":{
-        "text":"Hello"
+{"parameters":
+    {
+        "image_uri":"iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAABHNCSVQICAgIfAhkiAAAAg9JREFUSIntls+q4jAUxk9rrEVBLBXxD4YSA250I7izSKHos/gwvoUPoHup4NL2DYzv4e6bxUzDdG5va73MMIv7QegizffLOWnOqQEA9A9lFk1eLhdyHIcYY9TpdIhzTr1ej6Ioep+IAg0GAxDRh2GaJjqdDlqtFk6nU5HFB30KVEphNpvBMIxcaDoMw8B+v/8a8Hw+w7btjKllWTBNE7vdDkII1Ov1zPzhcKgOVEohDEPUajVtxhjD8XjMzcB8PtcZMAwDSZJUA/q+nzmn1WoFpVShwXK51GuEENWAruvqqOI4Ll0M/IzUsiy9ybIoNTBJEr3Q9/2XYKmiKIJpmiAiSClfA06nU73LKIoqAQFASgkiQqPRwP1+LwcGQaDPYrvdVgb+nqEgCMqBSil0u923UppKCFH68ejSNplMaLFYEBHR7XajOI4rVy3XdTPP0tJ2v9/1hbdtu/AsvhwhEZGUkq7XKzUaDXo+n+T7Pj0ej78XYarNZqM/oH6/X3r5U3meByKC53mfvpMLVEqh1+tVhnLOQUTgnFcD5kHb7XZp9RkOhyAiDIfD6sA8KGMMQgiEYZiJWCmF9XqtC3mr1XoPmJoFQQDGWKYPNptNeJ4Hzrm+8PSraxQ15VJgqjiOIaXMmP85GGM4n8+FPi8DUyVJAiklxuMxxuMxRqMRHMeBEOKlfmgA/9Ff2zfwG5inH+CITCfGp/dWAAAAAElFTkSuQmCC"
     }
 }
-
