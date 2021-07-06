@@ -15,7 +15,7 @@ document.getElementById("submit").addEventListener("click", function (e) {
       post_data = JSON.stringify({
         parameters: {
           image_uri: base64String,
-          top_k:10
+          top_k:20
         },
       });
 
@@ -49,15 +49,16 @@ document.getElementById("submit").addEventListener("click", function (e) {
         newDiv.setAttribute('id',id)
         result_div.appendChild(newDiv)
       })
-
+      internalCounter = 0
       console.log("Parsing CSV");
       $("#csv").parse({
         config: {
           delimiter: "auto",
           worker: true,
           fastMode:true,
-          chunk: function (rows) {
-            internalCounter = 0
+          // chunkSize:8e7,
+          complete: function (rows) {
+            
             parseCSV(rows,internalCounter,id_set,score_obj);
 
             

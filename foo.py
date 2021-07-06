@@ -10,6 +10,8 @@ from PIL import Image, ImageOps
 
 from binascii import a2b_base64
 
+# from tensorflow.keras.applications.vgg16 import VGG16
+
 
 X_train = pd.read_csv('./data/train.csv')
 X_train = X_train.drop('label',axis =1)
@@ -20,17 +22,18 @@ encoder = None
 def load_model():
     global encoder
     if encoder == None:
-        encoder = tf.keras.models.load_model('./model/mnist_encoder_model.h5')
+        # encoder = tf.keras.models.load_model('./model/mnist_encoder_model.h5')
+        encoder = tf.keras.models.load_model('./model/mnist_dense_softmax.h5')
         print('Model loaded')
     return encoder
 
 
 def mnist_encode_gen():
-    size = 500
+    size = 1000
     for i in range(size):
         img = X_train.iloc[i].to_numpy(dtype='float32')
         img /= 255.0
-        yield Document(embedding=encoder.predict(img.reshape(-1,28,28,1)),tags={'id':int(i)})
+        yield Document(embedding=encoder.predict(img.reshape(-1,28,28)),tags={'id':int(i)})
 
 def cosine_similarity(q, d):
     d_norm = np.linalg.norm(d,axis=2)
@@ -69,7 +72,7 @@ class MnistExecutor(Executor):
         encoder = load_model()
         
         
-        docs = DocumentArray([Document(embedding=encoder.predict(img.reshape(1,28,28,1)))])
+        docs = DocumentArray([Document(embedding=encoder.predict(img.reshape(1,28,28)))])
     
         
         q = np.stack(docs.get_attributes('embedding'))
@@ -85,11 +88,12 @@ class MnistExecutor(Executor):
             query.matches = [Document(self._docs[int(idx)], copy=True,tags={'score':float(d[0]),'id': int(self._docs[int(idx)].tags['id'])}) for idx, d in enumerate(dist)]
             query.matches.sort(key=lambda m: m.tags['score'])
 
-            if top_k > len(query.matches):
+            if top_k < len(query.matches):
                 query.matches = query.matches[:top_k]
+                # print(query.matches)
+
 
         return docs
-
         
         
 

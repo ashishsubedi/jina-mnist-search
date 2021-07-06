@@ -43,9 +43,9 @@
 
 
 
-import numpy as np
-import matplotlib.pyplot as plt
+# import numpy as np
+# import matplotlib.pyplot as plt
 import pandas as pd
 
-df = pd.read_csv('./data/train_sample.csv')
-print(df.iloc[85,0])
+# df = pd.read_csv('./data/train_sample.csv')
+# print(df.iloc[85,0])
